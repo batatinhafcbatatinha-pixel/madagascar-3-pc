@@ -11,7 +11,7 @@ An experimental port of the Xbox 360 game *DreamWorks Madagascar 3: The Video Ga
 - Reaches gameplay (Monte Carlo level, characters, HUD, minimap and dialogue) on Windows 11 x64 at 30 fps, as on the console, without the SDK's Xenos GPU plugin.
 - Graphics: the game's D3D calls are drawn by a native Direct3D 11 renderer; Xenos shader microcode is translated to HLSL.
 - Audio: the game's XMA exports are reimplemented on the host (FFmpeg's XMA decoder, SDL3 output).
-- **F1** (or Back + Start) opens the shared PC settings: display mode, internal resolution, VSync, FXAA, anisotropic filtering up to 16×, DirectX 11 or Vulkan through DXVK, volume.
+- **F1** (or Back + Start) opens the PC settings, drawn in the style of the game's own Options menu: display mode, internal resolution, VSync, FXAA, anisotropic filtering up to 16×, DirectX 11 or Vulkan through DXVK, volume.
 - Known issues: a hang if the language is confirmed within about 3 seconds of the screen appearing; a rare fatal call to address 0; the F1 menu still uses the plain theme; MSAA does not apply to the deferred G-buffer. Saves, full progression and stability are unverified.
 
 ## What is in this repository
@@ -35,6 +35,7 @@ Do not upload the ISO, extracted files, generated code or the built executable.
 
 - Port integration, native renderer and audio: [batatinhafcbatatinha-pixel](https://github.com/batatinhafcbatatinha-pixel).
 - [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk): Tom Clay and contributors, BSD-3-Clause; derived from [Xenia](https://github.com/xenia-project/xenia) (Ben Vanik and contributors). Shader-microcode semantics and XMA field layouts follow the SDK's Xenia-derived headers.
+- [PT Sans](https://github.com/google/fonts/tree/main/ofl/ptsans) by ParaType (SIL Open Font License 1.1, `project/fonts/OFL.txt`): the game's own typeface, shipped for the PC settings menu.
 - [FFmpeg](https://ffmpeg.org) (LGPL-2.1) for XMA decoding, [SDL3](https://www.libsdl.org) (zlib) for audio output, [DXVK](https://github.com/doitsujin/dxvk) (zlib) as the optional Vulkan path; external dependencies, not bundled.
 - Madagascar 3: The Video Game, its code, trademarks and assets belong to DreamWorks Animation, D3Publisher, Monkey Bar Games and the respective rights holders. This project is not affiliated with or endorsed by them or by Microsoft.
 

@@ -19,6 +19,8 @@ set(MADAGASCAR3_SOURCES
     src/native_audio/xma_engine.cpp
     src/native_audio/xma_commands.cpp
     src/pc_settings.cpp
+    src/pc_theme.cpp
+    src/pc_font.cpp
 )
 
 if(WIN32)
@@ -53,6 +55,13 @@ if(WIN32)
     add_executable(madagascar3_shaderc src/native_gpu/shaderc.cpp)
     target_link_libraries(madagascar3_shaderc PRIVATE madagascar3_native_shaders d3dcompiler)
 endif()
+
+# The settings menu's face: PT Sans (ParaType Free Font License / OFL), as the game uses.
+add_custom_command(TARGET madagascar3 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:madagascar3>/fonts"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/fonts/PT_Sans-Web-Bold.ttf"
+            "${CMAKE_CURRENT_SOURCE_DIR}/fonts/PT_Sans-Web-Regular.ttf" "${CMAKE_CURRENT_SOURCE_DIR}/fonts/OFL.txt"
+            "$<TARGET_FILE_DIR:madagascar3>/fonts/")
 
 # Vulkan option of the settings menu: DXVK's d3d11.dll/dxgi.dll in vulkan\ next to the
 # executable (pc_settings.cpp loads them by full path when "API grafica" is Vulkan).

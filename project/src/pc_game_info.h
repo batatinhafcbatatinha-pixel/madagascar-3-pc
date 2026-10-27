@@ -3,6 +3,8 @@
 
 #include "pc_settings.h"
 
+const pcs::Theme* PcMadagascarTheme();  // pc_theme.cpp
+
 inline pcs::GameInfo PcGameInfo() {
   pcs::GameInfo info;
   info.title = L"MADAGASCAR 3";
@@ -13,5 +15,6 @@ inline pcs::GameInfo PcGameInfo() {
   // One fixed step per frame, presented every second vblank (gpu_hooks.cpp paces the flips):
   // more frames would speed the game up.
   info.real_time = false;
+  info.theme = PcMadagascarTheme();
   return info;
 }
