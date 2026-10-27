@@ -11,7 +11,7 @@ An experimental port of the Xbox 360 game *DreamWorks Madagascar 3: The Video Ga
 - Reaches gameplay (Monte Carlo level, characters, HUD, minimap and dialogue) on Windows 11 x64 at 30 fps, as on the console, without the SDK's Xenos GPU plugin.
 - Graphics: the game's D3D calls are drawn by a native Direct3D 11 renderer; Xenos shader microcode is translated to HLSL.
 - Audio: the game's XMA exports are reimplemented on the host (FFmpeg's XMA decoder, SDL3 output).
-- **F1** (or Back + Start) opens the PC settings, drawn in the style of the game's own Options menu: display mode, internal resolution, VSync, FXAA, anisotropic filtering up to 16×, DirectX 11 or Vulkan through DXVK, volume.
+- **F1** (or Back + Start) opens the PC settings, drawn in the style of the game's own Options menu: display mode, internal resolution, VSync, FXAA, MSAA (off, 2x, 4x or 8x; applies at once), anisotropic filtering up to 16×, DirectX 11 or Vulkan through DXVK, volume.
 - Known issues: a hang if the language is confirmed within about 3 seconds of the screen appearing; a rare fatal call to address 0; the F1 menu still uses the plain theme; MSAA does not apply to the deferred G-buffer. Saves, full progression and stability are unverified.
 
 ## What is in this repository
