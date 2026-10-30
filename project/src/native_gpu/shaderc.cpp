@@ -1,9 +1,13 @@
+#include "../platform/native_byteorder.h"
 // Offline Xenos shader -> host Shader Model 5 compiler. Does not launch a game.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
-#include <d3dcompiler.h>
-#include <wrl/client.h>
+#ifndef _WIN32
+#include "../platform/native_win32_posix.h"
+#endif
+#include "../platform/native_shader_compiler.h"
+#include "../platform/native_com_ptr.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -40,7 +44,7 @@ int wmain(int argc, wchar_t** argv) {
     std::vector<uint32_t> code(size / 4);
     std::ifstream source(input, std::ios::binary);
     if (!source.read(reinterpret_cast<char*>(code.data()), size)) return 3;
-    for (auto& word : code) word = _byteswap_ulong(word);
+    for (auto& word : code) word = native_host::ByteSwap32(word);
     m3gpu::ShaderInfo info;
     m3gpu::TranslateOptions options;
     const std::string hlsl = m3gpu::TranslateXenosShader(code.data(), uint32_t(code.size()), pixel, options, info);

@@ -1,9 +1,12 @@
+#include "../platform/native_byteorder.h"
 #include "xma_commands.h"
 #include "xma_engine.h"
 
 #include <array>
 #include <atomic>
+#ifdef _WIN32
 #include <intrin.h>
+#endif
 
 #include <rex/logging.h>
 #include <rex/system/xmemory.h>
@@ -35,12 +38,12 @@ uint32_t Read(void*, void*, uint32_t address) {
     REXLOG_WARN("[native-xma] unsupported command register read {:04X}; compatibility incomplete", reg);
   // MMIO callback values use host byte order for bus bytes. The XDK uses
   // lwbrx/stwbrx around these little-endian command words.
-  return _byteswap_ulong(value);
+  return native_host::ByteSwap32(value);
 }
 
 void Write(void*, void*, uint32_t address, uint32_t bus_value) {
   const uint32_t reg = (address & 0xFFFF) / 4;
-  const uint32_t value = _byteswap_ulong(bus_value);
+  const uint32_t value = native_host::ByteSwap32(bus_value);
   auto& engine = XmaEngine::Get();
   if (!engine.ready()) return;
   if (reg == kLockControl) {

@@ -1,10 +1,13 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#ifndef _WIN32
+#include "../platform/native_win32_posix.h"
+#endif
 #include <d3d11.h>
 #include <dxgi1_2.h>
-#include <d3dcompiler.h>
-#include <wrl/client.h>
+#include "../platform/native_shader_compiler.h"
+#include "../platform/native_com_ptr.h"
 #include <algorithm>
 #include <stdexcept>
 #include "host_present.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include <d3dcompiler.h>
+#include "../platform/native_shader_compiler.h"
 
 namespace m3gpu {
 // The translator explicitly implements Xenos NaN/Inf and zero-multiply rules.

@@ -1,3 +1,5 @@
+#include "../platform/native_byteorder.h"
+#include "../platform/native_host_window.h"
 // Madagascar native GPU - host Direct3D 11 renderer (interface: native_gpu.h).
 //
 // Called from the guest D3D hooks (gpu_hooks.cpp) after the original function has done its CPU-side
@@ -20,13 +22,18 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#ifndef _WIN32
+#include "../platform/native_win32_posix.h"
+#endif
+#ifdef _WIN32
 #include <timeapi.h>
+#endif
 
 #include <d3d11_1.h>
 #include <d3d11sdklayers.h>
-#include <d3dcompiler.h>
+#include "../platform/native_shader_compiler.h"
 #include <dxgi1_2.h>
-#include <wrl/client.h>
+#include "../platform/native_com_ptr.h"
 
 #include "native_gpu.h"
 #include "host_present.h"
@@ -99,12 +106,12 @@ auto* Mem() { return rex::system::kernel_state()->memory(); }
 inline uint32_t Be32(const uint8_t* p) {
   uint32_t v;
   std::memcpy(&v, p, 4);
-  return _byteswap_ulong(v);
+  return native_host::ByteSwap32(v);
 }
 inline uint16_t Be16(const uint8_t* p) {
   uint16_t v;
   std::memcpy(&v, p, 2);
-  return _byteswap_ushort(v);
+  return native_host::ByteSwap16(v);
 }
 inline uint8_t* Virt(uint32_t a) { return Mem()->TranslateVirtual(a); }
 inline uint32_t LoadV(uint32_t a) { return Be32(Virt(a)); }
@@ -673,10 +680,12 @@ bool Renderer::Init(HWND hwnd) {
   ib.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
   if (FAILED(dev_->CreateBuffer(&ib, nullptr, &index_ring_))) return false;
 
-  wchar_t exe[MAX_PATH] = {};
-  GetModuleFileNameW(nullptr, exe, MAX_PATH);
-  cache_dir_ = std::filesystem::path(exe).parent_path() / "native_shader_cache";
-  out_dir_ = std::filesystem::path(exe).parent_path();
+  out_dir_ = native_host::ExecutableDirectory();
+#ifdef _WIN32
+  cache_dir_ = out_dir_ / "native_shader_cache";
+#else
+  cache_dir_ = out_dir_ / "native_shader_cache_vkd3d";
+#endif
   std::error_code ec;
   std::filesystem::create_directories(cache_dir_, ec);
 
@@ -792,13 +801,17 @@ bool Renderer::CreateUtility() {
 // D3DCompile with access violations inside the compiler turned into E_UNEXPECTED.
 HRESULT GuardedCompile(const std::string& source, const char* entry, const char* target,
                        ID3DBlob** blob, ID3DBlob** errors) {
+#ifdef _WIN32
   __try {
+#endif
     return D3DCompile(source.data(), source.size(), nullptr, nullptr, nullptr, entry, target,
                       kShaderCompileFlags, 0, blob, errors);
+#ifdef _WIN32
   } __except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER
                                                                 : EXCEPTION_CONTINUE_SEARCH) {
     return E_UNEXPECTED;
   }
+#endif
 }
 
 ComPtr<ID3DBlob> Renderer::Compile(const std::string& source, const char* entry,
@@ -2991,7 +3004,9 @@ bool RendererInit(void* hwnd) {
     REXLOG_ERROR("m3gpuative: no valid window handle for the renderer");
     return false;
   }
+#ifdef _WIN32
   timeBeginPeriod(1);
+#endif
   auto r = std::make_unique<Renderer>();
   if (!r->Init(static_cast<HWND>(hwnd))) return false;
   g_renderer = r.release();

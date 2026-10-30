@@ -1,3 +1,4 @@
+#include "platform/native_host_window.h"
 // madagascar3 - ReXGlue Recompiled Project
 //
 // Customize your app by overriding virtual hooks from rex::ReXApp.
@@ -47,7 +48,7 @@ class Madagascar3App : public rex::ReXApp {
   }
   void OnPostSetup() override { m3gpu::NativeGpuInstallMmio(); }
   void OnPreLaunchModule() override {
-    m3gpu::NativeGpuSetWindow(window() ? window()->GetNativeWindowHandle() : nullptr);
+    m3gpu::NativeGpuSetWindow(window() ? native_host::WindowHandle(window()) : nullptr);
   }
   void OnShutdown() override { m3gpu::NativeGpuShutdown(); }
 

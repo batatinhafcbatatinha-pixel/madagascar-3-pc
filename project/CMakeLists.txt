@@ -49,7 +49,10 @@ add_library(madagascar3_native_gpu STATIC
     src/native_gpu/textures.cpp)
 target_include_directories(madagascar3_native_gpu PRIVATE src/native_gpu)
 target_link_libraries(madagascar3_native_gpu PUBLIC madagascar3_native_shaders
-    rex::runtime rex::xxhash d3d11 dxgi d3dcompiler winmm)
+    rex::runtime rex::xxhash)
+if(WIN32)
+    target_link_libraries(madagascar3_native_gpu PUBLIC d3d11 dxgi d3dcompiler winmm)
+endif()
 target_link_libraries(madagascar3 PRIVATE madagascar3_native_gpu)
 if(WIN32)
     add_executable(madagascar3_shaderc src/native_gpu/shaderc.cpp)
@@ -77,4 +80,14 @@ if(WIN32 AND EXISTS "${DXVK_DIR}/x64/d3d11.dll")
             COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DXVK_DIR}/LICENSE"
                     "$<TARGET_FILE_DIR:madagascar3>/vulkan/LICENSE.dxvk.txt")
     endif()
+endif()
+
+# Native HLSL compiler for Linux (no Windows compiler DLL).
+include(src/platform/native_shader_compiler.cmake)
+if(TARGET native_shader_compiler)
+    foreach(_native_target IN ITEMS madagascar3 madagascar3_native_gpu)
+        if(TARGET ${_native_target})
+            target_link_libraries(${_native_target} PRIVATE native_shader_compiler)
+        endif()
+    endforeach()
 endif()

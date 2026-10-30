@@ -5,7 +5,7 @@
 // the game's own face) ships with the port in fonts\ next to the executable.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
-#include <windows.h>
+#include <cwctype>
 
 #include "pc_font.h"
 #include "pc_settings.h"
@@ -185,7 +185,7 @@ void Draw(const pcs::Theme& t, pcs::Canvas& c, pcs::MenuView& v) {
   };
   // The game writes its prompts in sentence case ("Back", "Select").
   auto sentence = [](std::wstring s) {
-    if (s.size() > 1) CharLowerBuffW(s.data() + 1, DWORD(s.size() - 1));
+    for (size_t i = 1; i < s.size(); ++i) s[i] = std::towlower(s[i]);
     return s;
   };
   hint(L'B', 0xFFD83A3Au, sentence(v.back), -2);

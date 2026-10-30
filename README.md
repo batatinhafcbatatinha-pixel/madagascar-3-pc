@@ -23,6 +23,13 @@ An experimental port of the Xbox 360 game *DreamWorks Madagascar 3: The Video Ga
 
 Build with `build-madagascar.cmd release build` (ReXGlue SDK `0.10.0.24-dev.gbd833a2`, Clang, Ninja). The script currently expects the author's local SDK and build locations.
 
+Linux (x86-64, native, no Wine): configure `project/` with the ReXGlue SDK's Linux package on `CMAKE_PREFIX_PATH`,
+Clang 20, `DXVK_NATIVE_DIR` (DXVK native 3.1.1: the D3D11 renderer on Vulkan) and vkd3d-shader 1.19+ on
+`PKG_CONFIG_PATH` (HLSL compiler); fontconfig and FreeType are needed for the PC settings text. Put the SDK
+runtime, DXVK native and vkd3d-shader next to the executable and add `libSDL3.so.0` as a link to the SDK
+runtime (it carries SDL3; DXVK's SDL3 WSI then shares it). The FIFA Street 3 kit's `tools/build_local.py` does
+all of this and is the reference until this repository has its own kit.
+
 ## Your game files
 
 ```text
