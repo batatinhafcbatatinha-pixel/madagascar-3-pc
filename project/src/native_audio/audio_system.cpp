@@ -2,6 +2,7 @@
 #include "audio_system.h"
 #include "../pc_settings.h"
 
+#include <atomic>
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -23,6 +24,9 @@
 namespace m3audio {
 
 namespace {
+
+// The output device stopped consuming (NativeAudioSystem::WorkerMain): drop the output.
+std::atomic<bool> g_output_stalled{false};
 
 NativeAudioSystem* g_system = nullptr;
 
@@ -178,7 +182,8 @@ void NativeAudioSystem::SubmitFrame(uint32_t index, uint32_t samples) {
   // Host stream volume from the PC settings menu (0 while it is open); game-side category gain
   // remains in the guest mixer.
   SDL_SetAudioStreamGain(stream, pcs::Volume());
-  SDL_PutAudioStreamData(stream, out, int(kFrameSamples * device_channels_ * sizeof(float)));
+  if (!g_output_stalled.load(std::memory_order_relaxed))
+    SDL_PutAudioStreamData(stream, out, int(kFrameSamples * device_channels_ * sizeof(float)));
   submitted_++;
   float peak = 0.0f;
   for (uint32_t i = 0; i < kFrameSamples * device_channels_; i++) peak = std::max(peak, std::fabs(out[i]));
@@ -194,6 +199,17 @@ void NativeAudioSystem::WorkerMain() {
   bool log = log_env && *log_env && *log_env != '0';
   auto log_start = std::chrono::steady_clock::now();
   uint32_t callbacks = 0;
+  // An output device that stops consuming (a TV or receiver switched off) keeps the stream full,
+  // and the guest would wait on its mixer callbacks forever: after 200 ms without progress the
+  // worker paces by the clock, as without a device, and drops the output until it plays again.
+  // MADAGASCAR3_AUDIO_STALL_TEST=<s> pauses the device after s seconds to exercise this.
+  auto last_progress = std::chrono::steady_clock::now();
+  uint32_t last_queued = 0;
+  const char* stall_env = std::getenv("MADAGASCAR3_AUDIO_STALL_TEST");
+  const double stall_test = stall_env ? std::atof(stall_env) : 0.0;
+  const auto worker_start = last_progress;
+  bool stall_test_done = false;
+  auto clock_next = last_progress;
   while (running_) {
     if (log && std::chrono::steady_clock::now() - log_start >= std::chrono::seconds(1)) {
       auto x = XmaEngine::Get().TakeStats();
@@ -210,6 +226,25 @@ void NativeAudioSystem::WorkerMain() {
       callbacks = 0;
       log_start = std::chrono::steady_clock::now();
     }
+    bool stalled = false;
+    {
+      std::lock_guard guard(lock_);
+      const auto now = std::chrono::steady_clock::now();
+      SDL_AudioStream* main_stream = clients_[0].in_use ? clients_[0].stream : nullptr;
+      if (main_stream && stall_test > 0 && !stall_test_done &&
+          std::chrono::duration<double>(now - worker_start).count() >= stall_test) {
+        stall_test_done = true;
+        SDL_PauseAudioStreamDevice(main_stream);
+      }
+      const uint32_t queued = main_stream ? QueuedFrames(clients_[0]) : 0;
+      if (!main_stream || queued < last_queued || queued < kTargetQueuedFrames) last_progress = now;
+      last_queued = queued;
+      stalled = main_stream && now - last_progress > std::chrono::milliseconds(200);
+      if (stalled != g_output_stalled.load(std::memory_order_relaxed)) {
+        g_output_stalled = stalled;
+        REXLOG_WARN("[native-audio] output device {}", stalled ? "stalled, pacing by the clock" : "playing again");
+      }
+    }
     uint32_t due[kMaxClients][3];
     uint32_t count = 0;
     {
@@ -217,7 +252,7 @@ void NativeAudioSystem::WorkerMain() {
       for (uint32_t i = 0; i < kMaxClients; i++) {
         Client& c = clients_[i];
         // Without a device the guest is paced by the clock instead (one frame per 5.33 ms).
-        if (c.in_use && c.callback && (!c.stream || QueuedFrames(c) < kTargetQueuedFrames)) {
+        if (c.in_use && c.callback && (!c.stream || stalled || QueuedFrames(c) < kTargetQueuedFrames)) {
           due[count][0] = c.callback;
           due[count][1] = c.callback_arg_ptr;
           due[count][2] = i;
@@ -243,7 +278,14 @@ void NativeAudioSystem::WorkerMain() {
         c = Client{};
       }
     }
-    if (!device_) std::this_thread::sleep_for(std::chrono::microseconds(5333));
+    if (!device_ || stalled) {
+      // One 256-sample frame per 5.333 ms, on a fixed schedule (a plain sleep after the
+      // callbacks ran slower than the 48 kHz clock).
+      const auto now = std::chrono::steady_clock::now();
+      if (now - clock_next > std::chrono::milliseconds(50)) clock_next = now;
+      clock_next += std::chrono::nanoseconds(5333333);
+      std::this_thread::sleep_until(clock_next);
+    }
   }
 }
 
