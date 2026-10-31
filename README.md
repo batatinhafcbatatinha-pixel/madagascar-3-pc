@@ -30,6 +30,8 @@ runtime, DXVK native and vkd3d-shader next to the executable and add `libSDL3.so
 runtime (it carries SDL3; DXVK's SDL3 WSI then shares it). The FIFA Street 3 kit's `tools/build_local.py` does
 all of this and is the reference until this repository has its own kit.
 
+Experimental [macOS](MACOS.md) build files are included; they have not been compiled or run yet.
+
 ## Your game files
 
 ```text
