@@ -45,6 +45,7 @@ class Madagascar3App : public rex::ReXApp {
         return input;
       };
     }
+    pcs::InstallPadTap(config);
   }
   void OnPostSetup() override { m3gpu::NativeGpuInstallMmio(); }
   void OnPreLaunchModule() override {

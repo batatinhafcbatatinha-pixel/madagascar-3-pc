@@ -53,3 +53,9 @@ Do not upload the ISO, extracted files, generated code or the built executable.
 <a id="notice"></a>
 
 **⚠️ THIS PROJECT DOES NOT INCLUDE THE GAME, AN ISO/XEX, GAME ASSETS, GENERATED GAME CODE OR A PRECOMPILED GAME EXECUTABLE. YOU MUST PROVIDE YOUR OWN LAWFULLY OBTAINED XBOX 360 GAME FILES AND HAVE THE RIGHTS REQUIRED FOR YOUR USE. THIS PROJECT DOES NOT AUTHORIZE COPYRIGHT INFRINGEMENT. ALL GAME RIGHTS BELONG TO THEIR RESPECTIVE OWNERS. ⚠️**
+
+## Controllers
+
+Keyboard and mouse: WASD moves, the arrows turn the camera, Space jumps, left and right mouse buttons are X and B, E is Y, Escape is START, Tab is BACK (`teclado=0` in the ini turns this off).
+
+Xbox pads and every pad SDL knows work in the game and in the PC settings menu: DualShock 3/4, DualSense, Switch pads, USB adapters for PS2 and original Xbox pads. `tools/fetch_pad_support.py` downloads `gamecontrollerdb.txt` (SDL_GameControllerDB, zlib license) next to the executable, so generic adapters get their button names. Only Xbox-type input was tested; no PlayStation pad or adapter has been tried on real hardware yet.
