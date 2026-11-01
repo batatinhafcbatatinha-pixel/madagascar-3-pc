@@ -1,0 +1,8 @@
+{
+  "repo": "madagascar-3-pc",
+  "audit_exempt": [],
+  "binary_exempt": [
+    "project/fonts/PT_Sans-Web-Bold.ttf",
+    "project/fonts/PT_Sans-Web-Regular.ttf"
+  ]
+}
