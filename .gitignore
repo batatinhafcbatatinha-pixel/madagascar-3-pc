@@ -63,3 +63,6 @@ game-install-report.json
 !/kit.json
 !/tools/audit_publication.py
 !/tools/fetch_pad_support.py
+
+# Notes for AI agents stay local
+/CONTINUACAO.md

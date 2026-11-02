@@ -38,7 +38,6 @@
 - `scripts/` — Utilitários de inspeção e extração de mídia Xbox 360 (`inspect_iso.py`, `extract_iso.py`).
 - `build-madagascar.cmd` — Script de compilação com Ninja / MSVC / Clang.
 - `Jogar-Madagascar3.cmd` — Inicializador amigável para testes de execução.
-- `CONTINUACAO.md` — Registro de status e planejamento de etapas futuras.
 
 ## Continuação de 25/10/2026
 

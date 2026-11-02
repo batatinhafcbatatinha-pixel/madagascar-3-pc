@@ -19,7 +19,7 @@ An experimental port of the Xbox 360 game *DreamWorks Madagascar 3: The Video Ga
 - `project/` — CMake project, ReXGlue manifest (`game_root` points to your local `game_files`), and the native code in `project/src/` (renderer, shader translation, audio, PC settings, scripted input).
 - `scripts/` — ISO inspection/extraction, image summary, import-call scan, function-extent and indirect-entry recovery, function matching, PowerPC disassembler, build pipeline and test runner.
 - `inputs/` — scripted-input files for automated test runs.
-- [NOTES.md](NOTES.md) and [CONTINUACAO.md](CONTINUACAO.md) — development log (in Portuguese).
+- [NOTES.md](NOTES.md) — development log (in Portuguese).
 
 Build with `build-madagascar.cmd release build` (ReXGlue SDK `0.10.0.24-dev.gbd833a2`, Clang, Ninja). The script currently expects the author's local SDK and build locations.
 
