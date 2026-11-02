@@ -62,3 +62,4 @@ game-install-report.json
 !/licenses/
 !/kit.json
 !/tools/audit_publication.py
+!/tools/fetch_pad_support.py
