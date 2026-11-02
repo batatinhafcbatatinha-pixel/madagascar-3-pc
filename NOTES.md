@@ -57,7 +57,7 @@ O último comando executa as três etapas com dois compiladores simultâneos. O 
 
 `extract_iso.py` limita extração adicional a 512 MiB e mantém 20 GiB livres por padrão. Use `--include` para selecionar caminhos. A extração completa dos ~4 GiB de recursos é recusada com esses limites. `inspect_iso.py --inventory-only` lê a ISO sem duplicar o XEX. Os recursos restantes ainda estão em `D:\ISO`; jogo, áudio, controles e saves continuam sem validação.
 
-Build Release concluída e smoke executado com GPU ativa. O runtime ainda aborta no alvo indireto não registrado `0x822F7ED8`; não há menu/gameplay validado. Detalhes em `CONTINUACAO.md`.
+Build Release concluída e smoke executado com GPU ativa. O runtime ainda aborta no alvo indireto não registrado `0x822F7ED8`; não há menu/gameplay validado.
 
 ## Integração nativa — continuação sem execução
 
