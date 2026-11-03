@@ -37,8 +37,14 @@ endif()
 
 # Host decoder/output; do not instantiate the SDK APU through the app factory.
 target_link_libraries(madagascar3 PRIVATE rex::libavcodec rex::libavutil)
-target_include_directories(madagascar3 PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../battlefield2/project/third_party/ffmpeg/include")
+# Public headers of the SDK's FFmpeg build (LGPL 2.1): tools/build_local.py puts them in third_party/ffmpeg;
+# the author's workspace shares the Battlefield 2 copy.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/ffmpeg/include/libavcodec/avcodec.h")
+    target_include_directories(madagascar3 PRIVATE third_party/ffmpeg/include)
+else()
+    target_include_directories(madagascar3 PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../battlefield2/project/third_party/ffmpeg/include")
+endif()
 
 # Offline native shader generation is independent of the Xenos GPU plugin.
 # Draw/resource hooks remain to be recovered before replacing that plugin.

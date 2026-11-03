@@ -4,9 +4,11 @@ setlocal
 cd /d "%~dp0"
 set "BIN_DIR=%~dp0project\out\build\win-amd64-release"
 if exist "%~dp0build-location.txt" set /p BIN_DIR=<"%~dp0build-location.txt"
+rem Setup.cmd (tools\build_local.py) builds into .local\build
+if exist "%~dp0.local\build\madagascar3.exe" set "BIN_DIR=%~dp0.local\build"
 if not exist "%BIN_DIR%\madagascar3.exe" (
-  echo Executavel nao encontrado em %BIN_DIR%.
-  echo Compile o projeto primeiro com build-madagascar.cmd.
+  echo The game is not built yet: run Setup.cmd first.
+  echo O jogo ainda nao foi montado: rode o Setup.cmd primeiro.
   pause
   exit /b 1
 )
